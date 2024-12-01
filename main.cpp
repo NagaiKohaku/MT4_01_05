@@ -9,12 +9,20 @@ const char kWindowTitle[] = "LE2C_18_ナガイコハク_MT4_01_05_球面線形�
 
 Quaternion SLerp(Quaternion q1, Quaternion q2, float t) {
 
+	//極小の値
+	float epsilon = 1e-6f;
+
 	//q1とq2の内積
 	float dot = Dot(q1, q2);
 
 	if (dot < 0) {
 		q1 = -q1; //もう片方の開店を利用する
 		dot = -dot; //内積も反転
+	}
+
+	if (dot >= 1.0f - epsilon) {
+		//θ=0の極限を求める
+		return q1 * (1.0f - t) + q2 * t;
 	}
 
 	//なす角
@@ -47,11 +55,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Novice::Initialize(kWindowTitle, 1280, 720);
 
 	// キー入力結果を受け取る箱
-	char keys[256] = {0};
-	char preKeys[256] = {0};
+	char keys[256] = { 0 };
+	char preKeys[256] = { 0 };
 
 	Quaternion rotation1 = MakeRotateAxisAngleQuaternion({ 0.71f,0.71f,0.0f }, 0.3f);
-	Quaternion rotation2 = MakeRotateAxisAngleQuaternion({ 0.71f,0.0f,0.71f }, 3.141592f);
+	Quaternion rotation2 = { -rotation1.x,-rotation1.y,-rotation1.z,-rotation1.w };
 
 	Quaternion interpolate1 = SLerp(rotation1, rotation2, 0.0f);
 	Quaternion interpolate2 = SLerp(rotation1, rotation2, 0.3f);
